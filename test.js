@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer');
   // Launch the browser with no-sandbox flag
   const browser = await puppeteer.launch({
     headless: true,
+    args: ['--no-sandbox']
   });
   
   // Create a new page
