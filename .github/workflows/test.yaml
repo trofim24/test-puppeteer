@@ -1,0 +1,22 @@
+name: puppeteer test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  puppeteer-docserver:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+
+      - name: Checkout main repository Dep.Tests
+        uses: actions/checkout@v4
+        
+      - name: Run tests
+        run: |
+          npm install
+          npm run test.js
