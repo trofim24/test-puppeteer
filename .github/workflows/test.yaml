@@ -14,6 +14,8 @@ jobs:
         
       - name: Configure Puppeteer sandbox
         run: |
+          npm install
+          
           # cd to Puppeteer cache directory (adjust the path if using a different cache directory)
           CHROME_VERSION=$(ls ~/.cache/puppeteer/chrome/linux-* -d 2>/dev/null | head -n 1 | xargs basename 2>/dev/null || echo "")
           if [ -z "$CHROME_VERSION" ]; then
@@ -30,7 +32,6 @@ jobs:
         
       - name: Run tests
         run: |
-          npm install
           node test.js
         env:
           CHROME_DEVEL_SANDBOX: /usr/local/sbin/chrome-devel-sandbox
