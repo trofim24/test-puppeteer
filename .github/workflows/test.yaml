@@ -1,22 +1,36 @@
 name: puppeteer test
-
 on:
   workflow_dispatch:
-
 jobs:
   puppeteer-docserver:
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
       - name: Set up nodejs
         uses: actions/setup-node@v4
         with:
           node-version: 'latest'
-
       - name: Checkout main repository Dep.Tests
         uses: actions/checkout@v4
+        
+      - name: Configure Puppeteer sandbox
+        run: |
+          # cd to Puppeteer cache directory (adjust the path if using a different cache directory)
+          CHROME_VERSION=$(ls ~/.cache/puppeteer/chrome/linux-* -d 2>/dev/null | head -n 1 | xargs basename 2>/dev/null || echo "")
+          if [ -z "$CHROME_VERSION" ]; then
+            echo "Chrome not installed yet, will be configured after npm install"
+          else
+            cd ~/.cache/puppeteer/chrome/$CHROME_VERSION/chrome-linux64/
+            sudo chown root:root chrome_sandbox
+            sudo chmod 4755 chrome_sandbox
+            # copy sandbox executable to a shared location
+            sudo cp -p chrome_sandbox /usr/local/sbin/chrome-devel-sandbox
+          fi
+          # export CHROME_DEVEL_SANDBOX env variable
+          echo "CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox" >> $GITHUB_ENV
         
       - name: Run tests
         run: |
           npm install
           node test.js
+        env:
+          CHROME_DEVEL_SANDBOX: /usr/local/sbin/chrome-devel-sandbox
